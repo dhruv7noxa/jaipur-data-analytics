@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaipur Data Analytics | Professional Real Estate Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="data:,">
+</head>
+<body class="dark-theme">
+    
+    <div id="app">
+        <nav class="top-nav">
+            <div class="logo">Jaipur <span class="highlight">Data Analytics</span></div>
+            <div class="nav-links">
+                <button onclick="showPage('home')" class="nav-btn active" id="btn-home">Overview</button>
+                <button onclick="showPage('map')" class="nav-btn" id="btn-map">Dynamic Map</button>
+                <button onclick="showPage('top200')" class="nav-btn" id="btn-top200">Township Lists</button>
+                <button onclick="showPage('trends')" class="nav-btn" id="btn-trends">Analytics</button>
+                <button onclick="showPage('areas')" class="nav-btn" id="btn-areas">Area Intel</button>
+                <button onclick="showPage('factors')" class="nav-btn" id="btn-factors">Spatial Score</button>
+                <button onclick="showPage('winners')" class="nav-btn" id="btn-winners">AI Winners</button>
+            </div>
+        </nav>
+
+        <main id="page-content">
+            
+            <section id="page-home" class="page-view active">
+                <div class="hero">
+                    <h1 class="reveal">Predictive Urban <br><span class="gradient-text">Spatial Intelligence.</span></h1>
+                    <p class="hero-subtitle reveal delay-1">
+                        This platform is engineered for investors and families seeking to relocate to Jaipur's most promising corridors. 
+                        We provide high-fidelity data on current land pricing, expected growth trajectories, and JDA future development trends. 
+                        Our engine filters only the elite townships and localities that represent the pinnacle of Jaipur's future expansion, 
+                        ensuring superior returns and premium living standards in both residential and commercial aspects.
+                        Targeted insights across the Ajmer Road, SEZ, and Ring Road development corridors.
+                    </p>
+                    
+                    <div class="hero-stats reveal delay-2">
+                        <div class="hero-stat-item">
+                            <span class="val">250+</span>
+                            <span class="label">Integrated Townships</span>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="val">₹4,500 Cr</span>
+                            <span class="label">Projected Value Flow</span>
+                        </div>
+                        <div class="hero-stat-item">
+                            <span class="val">9.8/10</span>
+                            <span class="label">Max AI Growth Score</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="brochure-container reveal">
+                    <div class="brochure-image-box">
+                        <img src="C:\Users\hp\.gemini\antigravity\brain\1dd84b7d-44c6-4cf8-8373-20a98e786bc6\jaipur_modern_apartment_architecture_1773992976468.png" alt="Modern Jaipur Architecture">
+                    </div>
+                    <div class="brochure-text">
+                        <h2>Future-Forward Infrastructure</h2>
+                        <p>We analyze the convergence of JDA regulatory shifts, industrial SEZ expansion, and residential demand clusters to pinpoint the next 1000% ROI opportunity.</p>
+                        <button class="cta-button" onclick="showPage('winners')">View AI Winners →</button>
+                    </div>
+                </div>
+
+                <div class="brochure-container reveal" style="direction: rtl; grid-template-columns: 0.8fr 1.2fr;">
+                    <div class="brochure-image-box" style="height: 400px;">
+                        <img src="C:\Users\hp\.gemini\antigravity\brain\1dd84b7d-44c6-4cf8-8373-20a98e786bc6\jaipur_construction_site_premium_1773992993787.png" alt="Construction Site">
+                    </div>
+                    <div class="brochure-text" style="direction: ltr;">
+                        <h2>Growth Modeling</h2>
+                         <p>Our engine tracks infrastructure progress in real-time. From the Ajmer Road widening to the new Ring Road junctions, we see the value before it hits the market.</p>
+                        <button class="cta-button" onclick="showPage('map')" style="background: var(--primary); color: white;">Open Google Satellite Map</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-map" class="page-view">
+                <header class="page-header map-header">
+                    <h2 class="page-title">Geospatial <span class="gradient-text">Data Science</span></h2>
+                    <p class="page-subtitle">High-Fidelity Analytic Layer | Verified Ground-Truth Coordinates</p>
+                </header>
+                <div class="map-controls-bar glass-card">
+                    <div class="search-box">
+                        <input type="text" id="map-search" placeholder="Search by name, area, type or color..." onkeyup="filterMap()">
+                    </div>
+                    <div class="filter-box">
+                        <label for="price-range">Price Range (150y): <span id="price-val">₹0L - ₹100L</span></label>
+                        <input type="range" id="price-range" min="0" max="150" step="1" value="150" oninput="filterMap()">
+                    </div>
+                </div>
+                <div class="map-wrapper glass-card">
+                    <div id="spatial-map" style="height: 700px;"></div>
+                </div>
+                
+                <div id="map-legend" class="glass-card legend-below-map">
+                    <h4 style="margin-top: 0; margin-bottom: 1rem; font-family: 'Playfair Display', serif; width: 100%; text-align: center;">Asset Legend</h4>
+                    <div id="legend-items" class="legend-items-grid">
+                        <!-- Legend items injected by JS -->
+                    </div>
+                </div>
+                
+                <div class="glass-card" style="margin-top: 3rem; padding: 2.5rem; background: var(--bg-card); border-radius: 30px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;">
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Satellite Accuracy</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Precise alignment with Google Earth imagery for actual ground placement.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--secondary); margin-bottom: 0.5rem;">Infrastructure View</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Real-time visualization of current construction and road networks.</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Spatial Data</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Coincident coordinate verification with JDA layout plans.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="page-top200" class="page-view">
+                <header class="page-header" style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2 style="font-size: 2.5rem; font-family: 'Playfair Display', serif;">Township Rankings</h2>
+                        <p style="color: var(--text-muted);">Comprehensive list of Jaipur corridor projects with 10Y ROI Projections</p>
+                    </div>
+                    <div class="controls-mini">
+                        <input type="text" id="township-search" placeholder="Filter projects..." onkeyup="filterTop200()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--card-border); padding: 0.8rem 1.5rem; border-radius: 12px; min-width: 300px;">
+                    </div>
+                </header>
+                <div class="table-container" style="background: var(--bg-card); border-radius: 32px; padding: 1.5rem; border: 1px solid var(--card-border); max-height: 800px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Zone</th>
+                                <th>150 SQYD</th>
+                                <th>200 SQYD</th>
+                                <th>5Y ROI</th>
+                                <th>10Y ROI</th>
+                                <th>AI Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top200-body"></tbody>
+                    </table>
+                </div>
+
+                <!-- NEW AI PRECAUTIONS SECTION -->
+                <div class="reveal delay-1" style="margin-top: 4rem; padding: 3rem; background: rgba(216, 27, 96, 0.03); border-radius: 35px; border: 1px solid var(--card-border);">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 2rem; color: var(--primary);">Investment Safeguards: <span style="color:white;">Property Checklist</span></h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem;">
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px;">
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">🛡️ Legal & Regulatory</h4>
+                            <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem; color: var(--text-muted);">
+                                <li><strong>JDA/JMC Approval:</strong> Verify the layout plan approval number on the official JDA portal.</li>
+                                <li><strong>RERA Registration:</strong> Ensure the project has an active RERA number (Rajasthan Real Estate Regulatory Authority).</li>
+                                <li><strong>Title Deed:</strong> Request the "Pattas" or allotment letters to ensure a clear, marketable title.</li>
+                            </ul>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px;">
+                            <h4 style="color: var(--secondary); margin-bottom: 1rem;">🏗️ Infrastructure & Utilities</h4>
+                            <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem; font-size: 0.95rem; color: var(--text-muted);">
+                                <li><strong>Road Connectivity:</strong> Cross-check the site's proximity to the Master Plan 2025 sector roads and Ring Road junctions.</li>
+                                <li><strong>Water Supply:</strong> Confirm the availability of Bisalpur water connections or JDA-approved borewell rights.</li>
+                                <li><strong>Utility Lines:</strong> Check for underground electrification and sewage treatment plant (STP) status.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-trends" class="page-view">
+                <header class="page-header" style="text-align:center; margin-bottom: 4rem;">
+                    <h2 style="font-size: 2.5rem; font-family: 'Playfair Display', serif;">Corridor Appreciation Trends</h2>
+                    <p style="color: var(--text-muted);">Cross-referencing price per sqyd against investment viability</p>
+                </header>
+                
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 3rem;">
+                    <div class="glass-card" style="padding: 2rem; background: var(--bg-card); border-radius: 30px; border: 1px solid var(--card-border);">
+                        <canvas id="trendsChart" style="height: 500px;"></canvas>
+                        <p style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                            * Scatter plot showing the correlation between AI growth scores and current pricing. Upper-left quadrant indicates high-value undervalued opportunities.
+                        </p>
+                    </div>
+                    <div class="analytics-sidebar">
+                        <div class="glass-card" style="padding: 2rem; background: rgba(99, 102, 241, 0.1); border-radius: 25px; border: 1px solid var(--primary); margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">👑 Market Leaders</h3>
+                            <div id="top-rankings" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; background: rgba(244, 63, 94, 0.1); border-radius: 25px; border: 1px solid var(--secondary);">
+                            <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">⚠️ High Risk zones</h3>
+                            <div id="bottom-rankings" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW AI ANALYTICS SECTION -->
+                <div class="reveal delay-1" style="margin-top: 5rem; border-top: 1px solid var(--card-border); padding-top: 4rem;">
+                    <div class="glass-card" style="padding: 3.5rem; background: linear-gradient(145deg, rgba(20, 12, 14, 0.8), rgba(216, 27, 96, 0.05)); border-radius: 40px;">
+                        <h2 style="font-family: 'Playfair Display', serif; font-size: 2.8rem; margin-bottom: 2rem; color: white;">Jaipur: The <span class="gradient-text">Horizon of Urban Evolution</span></h2>
+                        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 4rem; align-items: start;">
+                            <div style="line-height: 1.8; font-size: 1.15rem; color: var(--text-muted);">
+                                <p style="margin-bottom: 1.5rem;">
+                                    <strong>Jaipur Data Analytics</strong> is more than just a pricing platform; it is a geospatial intelligence engine designed to decode the DNA of Jaipur's expansion. As of 2026, the city is undergoing an aggressive "South-West Tilt," where the traditional power centers are being complemented by high-tech corridors.
+                                </p>
+                                <p style="margin-bottom: 1.5rem;">
+                                    Our predictive models indicate a 25-40% annual appreciation in the Ajmer Road corridor over the next decade, fueled by institutional growth, premium residential demand, and a new wave of IT/Industrial infrastructure including the Mahindra World City SEZ expansion and Ring Road Phase-2 completions.
+                                </p>
+                                <p>
+                                    This platform serves as the bridge between raw JDA data and actionable investment wisdom, ensuring that your future in Jaipur is built on a foundation of ground-truth data.
+                                </p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border-radius: 30px; padding: 2.5rem; border: 1px solid rgba(255,152,0,0.2);">
+                                <h4 style="color: var(--secondary); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Key Growth Catalysts</h4>
+                                <ul style="list-style: none; display: flex; flex-direction: column; gap: 1.5rem;">
+                                    <li style="display: flex; gap: 1rem;">
+                                        <span style="color: var(--primary); font-weight: 800;">01.</span>
+                                        <div style="font-size: 0.95rem;"><strong>The IT-Industrial Synergy:</strong> Mahindra World City is evolving into a hybrid ecosystem of IT parks and luxury residential townships.</div>
+                                    </li>
+                                    <li style="display: flex; gap: 1rem;">
+                                        <span style="color: var(--primary); font-weight: 800;">02.</span>
+                                        <div style="font-size: 0.95rem;"><strong>Infrastructure Precision:</strong> Segmenting the "Live-Work-Play" micro-markets with the new bypass and widening of transit arteries.</div>
+                                    </li>
+                                    <li style="display: flex; gap: 1rem;">
+                                        <span style="color: var(--primary); font-weight: 800;">03.</span>
+                                        <div style="font-size: 0.95rem;"><strong>ROI Acceleration:</strong> AI-driven projections show a 2.5x faster appreciation for developments with high "Spatial Scores".</div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-factors" class="page-view">
+                <header class="page-header" style="text-align:center; margin-bottom: 4rem;">
+                    <h2 style="font-size: 2.5rem; font-family: 'Playfair Display', serif;">Spatial Value <span class="gradient-text">Scoreboard</span></h2>
+                    <p style="color: var(--text-muted);">Points based on proximity to 60+ geographic growth factors (2km/5km/8km Radius)</p>
+                </header>
+                <div class="table-container" style="background: var(--bg-card); border-radius: 32px; padding: 2.5rem; border: 1px solid var(--card-border);">
+                    <table style="margin-bottom: 3rem;">
+                        <thead>
+                            <tr>
+                                <th>Project Rank</th>
+                                <th>Township Name</th>
+                                <th>Market Price (150y)</th>
+                                <th>Proximity Points</th>
+                                <th>Growth Potential</th>
+                            </tr>
+                        </thead>
+                        <tbody id="factors-body"></tbody>
+                    </table>
+
+                    <!-- New Chart -->
+                    <div style="height: 400px; margin-top: 2rem; position: relative;">
+                        <canvas id="spatialChart"></canvas>
+                    </div>
+                </div>
+                <div class="glass-card" style="margin-top: 2rem; padding: 1.5rem; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+                    <strong>Scoring Algorithm:</strong> 100% factor points within 2km | 50% points up to 5km | 25% points up to 8km. <br>
+                    <span style="color:var(--secondary)">* Penalty: -60 points for each missing essential category (School, Hospital, University) within 8km.</span>
+                </div>
+
+                <!-- NEW AI TRAVEL & LIFESTYLE SECTION -->
+                <div class="reveal delay-1" style="margin-top: 5rem; padding: 4rem; background: linear-gradient(135deg, rgba(255, 152, 0, 0.05), rgba(216, 27, 96, 0.05)); border-radius: 40px; border: 1px solid var(--card-border);">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 2.5rem; text-align: center;">Experience Jaipur: <span class="gradient-text">Top Travel Picks</span></h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🏰</div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.8rem;">Royal Heritage</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Explore the <strong>Amber Fort</strong>, <strong>City Palace</strong>, and the iconic <strong>Hawa Mahal</strong>. Don't miss the sunrise at <strong>Jal Mahal</strong>.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🌅</div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.8rem;">Panoramic Views</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Catch the most breathtaking sunset over the Pink City from the heights of <strong>Nahargarh Fort</strong> or the historic <strong>Jaigarh Fort</strong>.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🥘</div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.8rem;">Ethnic Culture</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Immerse yourself in authentic Rajasthani hospitality, folk dance, and cuisine at <strong>Chokhi Dhani</strong> ethnic village resort.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 25px; text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🦓</div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.8rem;">Wild Adventures</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">Experience the thrill of a <strong>Jhalana Leopard Safari</strong> or stroll through the beautifully manicured <strong>City Park (Mansarovar)</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-winners" class="page-view">
+                <header class="page-header" style="text-align:center; margin-bottom: 4rem;">
+                    <h1 style="font-size: 3.5rem; font-family: 'Playfair Display', serif; margin-bottom: 1rem;">AI <span class="gradient-text">Winners Circle</span></h1>
+                    <p style="color: var(--text-muted);">Top 3 picks across Price, Performance, and Spatial Value</p>
+                </header>
+                
+                <div id="winners-categories-container" style="display: flex; flex-direction: column; gap: 6rem;">
+                    <div class="reveal">
+                        <h3 style="text-align:center; margin-bottom:2rem; font-size:1.8rem; letter-spacing:2px; color:var(--primary);">I. MOST AFFORDABLE ENTRY</h3>
+                        <div id="winners-affordable" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;"></div>
+                    </div>
+                    <div>
+                        <h3 style="text-align:center; margin-bottom:2rem; font-size:1.8rem; letter-spacing:2px; color:var(--success);">II. HIGHEST GROWTH POTENTIAL</h3>
+                        <div id="winners-growth" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;"></div>
+                    </div>
+                    <div>
+                        <h3 style="text-align:center; margin-bottom:2rem; font-size:1.8rem; letter-spacing:2px; color:var(--secondary);">III. TOP SPATIAL VALUE (POINTS)</h3>
+                        <div id="winners-points" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;"></div>
+                    </div>
+                </div>
+
+                <!-- NEW STRATEGIC INVESTMENT NARRATIVE -->
+                <div class="reveal delay-2" style="margin-top: 6rem; padding: 4rem; background: linear-gradient(145deg, rgba(20, 12, 14, 0.9), rgba(216, 27, 96, 0.08)); border-radius: 45px; border: 1px solid var(--card-border);">
+                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.8rem; margin-bottom: 2.5rem; text-align: center; color: white;">The <span class="gradient-text">Investor's Trilemma</span> Decoded</h2>
+                    <div style="column-count: 2; column-gap: 4rem; line-height: 1.8; color: var(--text-muted); font-size: 1.05rem; text-align: justify;">
+                        <p style="margin-bottom: 1.5rem;">
+                            The decision between affordability, growth, and spatial value represents the classic "Investor's Trilemma" in Jaipur's real estate market. The <strong>Most Affordable Entry</strong> category targets the price-sensitive buyer or the early-stage speculator. These projects, often located in the expanding peripheries like Bagru or Ratalya, offer the lowest capital entry barriers. While they may currently lack immediate luxury infrastructure, their value lies in the "low-base effect," where even minor local developments can trigger significant percentage-wise gains. These are "patient capital" plays that require a 7-10 year horizon. 
+                        </p>
+                        <p style="margin-bottom: 1.5rem;">
+                            In contrast, <strong>Highest Growth Potential</strong> picks are the high-velocity assets of the dashboard. These townships are situated squarely in the path of imminent "Value-Unlocked" catalysts, such as the completion of a major SEZ phase or a new Ring Road cloverleaf. While the entry price is higher than the affordable tier, the ROI velocity is superior because the demand-supply gap is narrowing rapidly. These are aggressive growth plays for those seeking maximum appreciation in a 3-5 year window, capitalizing on the "Maturity Wave" of the Ajmer Road corridor.
+                        </p>
+                        <p>
+                            Finally, <strong>Top Spatial Value (Points)</strong> represents the "Blue Chip" segment of the Pink City. These projects are verified by our algorithm for their proximity to the three urban pillars: elite schools (like Jayshree Periwal), multi-specialty hospitals, and academic hubs (like Manipal University). A high spatial score indicates "Legacy Resilience"—meaning these properties are the least likely to depreciate during market corrections and the most likely to command premium rentals. They offer the ultimate balance of lifestyle quality and long-term capital security, making them the preferred choice for end-users and risk-averse institutional investors.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-areas" class="page-view">
+                <header class="page-header" style="margin-bottom: 3rem; text-align: center;">
+                    <h2 class="page-title">Jaipur <span class="gradient-text">Data Analytics</span></h2>
+                    <p class="page-subtitle">Granular pricing datasets across 62 prominent localities</p>
+                </header>
+                
+                <div class="table-container" style="background: var(--bg-card); border-radius: 32px; padding: 1.5rem; border: 1px solid var(--card-border); max-height: 600px; overflow-y: auto; margin-bottom: 3rem;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Area Name</th>
+                                <th>Per Sq.Ft Property</th>
+                                <th>Avg 2BHK Rent (Monthly)</th>
+                                <th>1800 Sqft Flat Price</th>
+                                <th>Per Sq.Yd Land</th>
+                                <th>Median Residential</th>
+                                <th>Median Commercial</th>
+                                <th>200 Sqyd 2-Floor House</th>
+                            </tr>
+                        </thead>
+                        <tbody id="areas-body"></tbody>
+                    </table>
+                </div>
+
+                <div class="glass-card" style="padding: 2.5rem; background: var(--bg-card); border-radius: 30px; border: 1px solid var(--card-border); margin-bottom: 3rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+                        <div>
+                            <h3 style="color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">💎 Top 5 Alpha Zones (Expensive)</h3>
+                            <div id="expensive-areas-list" style="display: flex; flex-direction: column; gap: 0.8rem;"></div>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--success); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">🌟 Top 5 Value Entries (Affordable)</h3>
+                            <div id="affordable-areas-list" style="display: flex; flex-direction: column; gap: 0.8rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="padding: 2rem; background: var(--bg-card); border-radius: 30px; border: 1px solid var(--card-border);">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--text-main); font-size: 1.3rem; text-align: center;">Average Price vs Rent Yield (150 sqyd Residential)</h3>
+                    <div style="height: 500px; position: relative;">
+                        <canvas id="areaYieldChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- New Map for Areas with layer toggle -->
+                <div style="position: relative; margin-top: 3rem;">
+                    <div id="area-intel-map" class="glass-card" style="height: 600px; border-radius: 30px; border: 1px solid var(--card-border); overflow: hidden;"></div>
+                    <button onclick="toggleAreaMapLayer()" class="cta-button" style="position: absolute; top: 20px; right: 20px; z-index: 1000; padding: 10px 20px; font-size: 0.8rem; background: #fbbf24; color: #ef4444; border: 2px solid #ef4444; font-weight: 800; text-transform: uppercase; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); backdrop-filter: none;">
+                        Switch to Satellite View
+                    </button>
+                </div>
+
+                <!-- NEW MARKET Q&A SECTION -->
+                <div class="reveal delay-1" style="margin-top: 5rem; padding: 4rem; background: rgba(255, 255, 255, 0.02); border-radius: 40px; border: 1px solid var(--card-border);">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 3rem; text-align: center;">Market Intelligence: <span class="gradient-text">Q&A Insight</span></h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: How does the JDA "Master Plan 2025" affect nearby property prices?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: Designation of new sector roads or commercial zones in the Master Plan immediately increases speculation-led pricing and long-term utility value, as it formalizes the urban boundary.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: Why do areas near the SEZ (Mahindra World City) command a premium?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: Proximity to high-density employment hubs creates a permanent demand for both rental housing and executive residences, stabilizing price floors and ensuring consistent occupancy.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: What is the impact of a "Spatial Score" on rental yields?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: High Spatial Scores typically correlate with 20-30% higher rental yields because of the "Convenience Premium" that families are willing to pay for being near schools and clinical hubs.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: Does "Green Buffer Zone" proximity increase property value?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: On the contrary, proximity to ecological zones like the Jhalana Forest or Dravyavati Riverfront increases value due to "Prestige Scarcity" and improved resident well-being.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: How do "Ring Road" junctions influence land pricing?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: Regions within 2-3km of Ring Road interchanges see "Logistical Appreciation," making them hotbeds for commercial development and hybrid office-warehousing infrastructure.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: Why are prices in "C-Scheme" significantly higher than suburban corridors?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: Core pricing is driven by "Absolute Scarcity" and institutional proximity. While ROI velocity is lower than emerging belts, the value represents the most stable wealth preservation tool.</p>
+                        </div>
+                        <div class="glass-card" style="padding: 2rem; border-radius: 20px;">
+                            <h5 style="color: var(--secondary); margin-bottom: 0.8rem; font-size: 1.1rem;">Q: Can a lack of "Bisalpur Water" connectivity decrease an area's price?</h5>
+                            <p style="color: var(--text-muted); font-size: 0.95rem;">A: Yes, areas dependent solely on groundwater often see a 10-15% price discount compared to JDA schemes with guaranteed infrastructure, due to long-term sustainability concerns.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ABOUT THE CREATOR (Integrated Universally) -->
+        <section class="about-creator-section" id="about-section">
+            <div class="creator-card">
+                <div class="creator-img-box">D.M</div>
+                <div class="creator-info">
+                    <h2>Dhruv Meena</h2>
+                    <span class="tagline">Owner & Lead Developer, Jaipur Data Analytics</span>
+                    <p class="creator-bio">
+                        Bechlors Computer Science Scholar at <strong>IIT Patna</strong>. 
+                        A Jaipur native with a profound professional interest in the region's urban evolution. 
+                        My relationship with Jaipur Development Authority (JDA) standards and the shifting real estate landscape 
+                        of my hometown inspired the creation of this high-fidelity spatial analytics platform.
+                    </p>
+                    <div class="creator-details">
+                        <div class="detail-item">
+                            <strong>Institute</strong>
+                            Indian Institute of Technology (IIT), Patna<br>
+                            Bhita Kanpa Rd, Patna, Bihar 801106
+                        </div>
+                        <div class="detail-item">
+                            <strong>Contact</strong>
+                            +91 785099192<br>
+                            Dhruv123meena@gmail.com
+                        </div>
+                        <div class="detail-item">
+                            <strong>Campus Address</strong>
+                            Hostel: C.V. Raman, IIT Patna
+                        </div>
+                        <div class="detail-item">
+                            <strong>Technology Stack</strong>
+                            Vanilla JS, SVG Spatial Engine, Chart.js, Glassmorphism CSS.
+                        </div>
+                    </div>
+                    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: #94a3b8;">
+                        &copy; 2026 Dhruv Meena. All JDA Scheme references are for analytical simulation purposes. Verified for IIT Patna Data Science Project.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+            Jaipur Data Analytics v5.0 | Zero-Lag Dynamic Map Engine | Built by Dhruv Meena
+        </footer>
+    </div>
+
+    <script src="areas_geojson.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
